@@ -29,7 +29,7 @@ class ArtModel {
 		 * 获取分类信息
 		 */
 		$query = $this->_db->prepare( "select `name` from `cate` WHERE `id`=?" );
-		$query->execute( [$artInfo['cate']] );
+		$query->execute( [ $artInfo['cate'] ] );
 		$ret = $query->fetchAll();
 		if ( ! $ret ) {
 			$this->errno  = - 2010;
@@ -48,6 +48,63 @@ class ArtModel {
 			'mtime'    => $artInfo['mtime'],
 			'status'   => $artInfo['status'],
 		];
+
+		return $data;
+	}
+
+	public function list( $pageNo, $pageSize = 10, $cate = 0, $status = 'offline' ) {
+		$start = $pageNo * $pageSize + ( $pageNo == 0 ? 0 : 1 );
+		if ( $cate == 0 ) {
+			$filter = [ $status, intval( $start ), intval( $pageSize ) ];
+			$query  = $this->_db->prepare( "select id,title,content,author,cate,mtime,`status` FROM art WHERE status=? ORDER BY mtime desc LIMIT ?,?" );
+		} else {
+			$filter = [ intval( $cate ), $status, intval( $start ), intval( $pageSize ) ];
+			$query  = $this->_db->prepare( "select id,title,content,author,cate,mtime,`status` FROM art WHERE cate=? AND status=? ORDER BY mtime desc LIMIT ?,?" );
+		}
+		$stat = $query->execute( $filter );
+		$ret  = $query->fetchAll();
+		if ( ! $ret ) {
+			$this->errno  = - 2011;
+			$this->errmsg = "获取文章列表失败，ErrInfo:";
+
+			return false;
+		}
+
+		$data     = [];
+		$cateInfo = [];
+		foreach ( $ret as $item ) {
+			/**
+			 * 获取分类信息
+			 */
+			if ( isset( $cateInfo[ $item['cate'] ] ) ) {
+				$cateName = $cateInfo[ $item['cate'] ];
+			} else {
+				$query = $this->_db->prepare( "select `name` from `cate` WHERE `id`=?" );
+				$query->execute( [ $item['cate'] ] );
+				$retCate = $query->fetchAll();
+				if ( ! $ret ) {
+					$this->errno  = - 2010;
+					$this->errmsg = '获取分类信息失败，ErrInfo：';
+
+					return false;
+				}
+				$cateName = $cateInfo[ $item['content'] ] = $retCate[0]['name'];
+			}
+			/**
+			 * 正文太长剪切
+			 */
+			$contents = mb_strlen( $item['content'] ) > 30 ? mb_substr( $item['content'], 0, 30 ) . "..." : $item['content'];
+			$data[]   = [
+				'id'       => intval( $item['id'] ),
+				'title'    => intval( $item['title'] ),
+				'content'  => $contents,
+				'author'   => intval( $item['author'] ),
+				'cateName' => $cateName,
+				'cateId'   => intval( $item['cate'] ),
+				'mtime'    => intval( $item['mtime'] ),
+				'status'   => intval( $item['status'] ),
+			];
+		}
 
 		return $data;
 	}
