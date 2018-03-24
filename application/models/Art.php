@@ -13,6 +13,45 @@ class ArtModel {
 		$this->_db->setAttribute( PDO::ATTR_EMULATE_PREPARES, false );
 	}
 
+	public function get( $artId ) {
+		$query  = $this->_db->prepare( "SELECT * FROM art WHERE id=?" );
+		$status = $query->execute( [ $artId ] );
+		$ret    = $query->fetchAll();
+		if ( ! $ret || ! $status ) {
+			$this->errno  = - 2009;
+			$this->errmsg = "查询失败，ErrInfo" . end( $query->errorInfo() );
+
+			return false;
+		}
+		$artInfo = $ret[0];
+
+		/**
+		 * 获取分类信息
+		 */
+		$query = $this->_db->prepare( "select `name` from `cate` WHERE `id`=?" );
+		$query->execute( [$artInfo['cate']] );
+		$ret = $query->fetchAll();
+		if ( ! $ret ) {
+			$this->errno  = - 2010;
+			$this->errmsg = '获取分类信息失败，ErrInfo：' . end( $query->errorInfo() );
+
+			return false;
+		}
+		$artInfo['cateName'] = $ret[0]['name'];
+		$data                = [
+			'id'       => intval( $artInfo['id'] ),
+			'title'    => $artInfo['title'],
+			'content'  => $artInfo['content'],
+			'author'   => $artInfo['author'],
+			'cateName' => $artInfo['cateName'],
+			'cateId'   => $artInfo['cate'],
+			'mtime'    => $artInfo['mtime'],
+			'status'   => $artInfo['status'],
+		];
+
+		return $data;
+	}
+
 	public function add( $title, $contents, $author, $cate, $artId = 0 ) {
 		$isEdit = false;
 		if ( $artId != 0 && is_numeric( $artId ) ) {
@@ -64,5 +103,31 @@ class ArtModel {
 		} else {
 			return intval( $artId );
 		}
+	}
+
+	public function del( $artId ) {
+		$query = $this->_db->prepare( "DELETE FROM `art` WHERE `id`=?" );
+		$ret   = $query->execute( intval( $artId ) );
+		if ( ! $ret ) {
+			$this->errno  = - 2007;
+			$this->errmsg = "删除失败，ErrInfo：" . end( $query->errorInfo() );
+
+			return false;
+		}
+
+		return true;
+	}
+
+	public function status( $artId, $status = 'offline' ) {
+		$query = $this->_db->prepare( "UPDATE `art` set `status`=? WHERE `id`=?" );
+		$ret   = $query->execute( [ $status, intval( $artId ) ] );
+		if ( ! $ret ) {
+			$this->errno  = - 2007;
+			$this->errmsg = "修改状态失败，ErrInfo：" . end( $query->errorInfo() );
+
+			return false;
+		}
+
+		return true;
 	}
 }
