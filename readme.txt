@@ -5,3 +5,4 @@
 	yaf.environ="product"
 4.重启Webserver;
 5.访问http://yourhost/demo2/,出现Hellow Word!, 表示运行成功,否则请查看php错误日志;
+13e15c36a8841100e8351a7b998574ae
