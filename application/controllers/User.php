@@ -53,7 +53,7 @@ class UserController extends Yaf_Controller_Abstract {
 			] );
 		}
 
-		return true;
+		return false;
 	}
 
 	public function registerAction() {

@@ -1,4 +1,4 @@
 <?php
-$arr = [ 1, 2, 3, 4 ];
-$arr[] = 12312312;
-print_r( $arr );
+echo dirname( __FILE__ );
+echo '<br/>';
+echo dirname( __DIR__ );
