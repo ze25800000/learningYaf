@@ -78,7 +78,14 @@ class WxpayController extends Yaf_Controller_Abstract {
 	}
 
 	public function callbackAction() {
-		$billId = $this->getRequest()->getQuery( 'billId', '' );
+		$model = new WxpayModel();
+		$model->callback();
+		echo json_encode( [
+			'errno'  => 0,
+			'errmsg' => 0
+		] );
 
+		return false;
 	}
+
 }
