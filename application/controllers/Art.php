@@ -57,7 +57,7 @@ class ArtController extends Yaf_Controller_Abstract {
 			] );
 		}
 
-		return true;
+		return false;
 	}
 
 	public function editAction() {
@@ -81,7 +81,7 @@ class ArtController extends Yaf_Controller_Abstract {
 			return false;
 		}
 
-		return true;
+		return false;
 	}
 
 	public function delAction() {
@@ -118,7 +118,7 @@ class ArtController extends Yaf_Controller_Abstract {
 			return false;
 		}
 
-		return true;
+		return false;
 	}
 
 	public function statusAction() {
@@ -156,7 +156,7 @@ class ArtController extends Yaf_Controller_Abstract {
 			return false;
 		}
 
-		return true;
+		return false;
 	}
 
 	public function getAction() {
