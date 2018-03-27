@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @name IndexController
- * @author
- * @desc 默认控制器
- * @see http://www.php.net/manual/en/class.yaf-controller-abstract.php
- */
 class UserController extends Yaf_Controller_Abstract {
 	public function indexAction() {
 		return $this->loginAction();
@@ -23,13 +17,19 @@ class UserController extends Yaf_Controller_Abstract {
 		$pwd   = Common_Request::postRequest( 'pwd', false );
 
 		if ( ! $uname || ! $pwd ) {
-			Common_Request::response( - 1002, "用户名或密码必须传递" );
+			echo Common_Request::response( - 1002, "用户名或密码必须传递" );
 
 			return false;
 		}
-		// 调用model，做登录验证
-		$model = new UserModel();
-		$uid   = $model->login( trim( $uname ), trim( $pwd ) );
+		try {
+			// 调用model，做登录验证
+			$model = new UserModel();
+			$uid   = $model->login( trim( $uname ), trim( $pwd ) );
+		} catch ( Exception $e ) {
+			echo json_encode( Err_Map::get( 1000 ) );
+
+			return false;
+		}
 		if ( $uid ) {
 			// 种session
 			session_start();
@@ -51,26 +51,16 @@ class UserController extends Yaf_Controller_Abstract {
 		$uname = $this->getRequest()->getPost( 'uname', false );
 		$pwd   = $this->getRequest()->getPost( 'pwd', false );
 		if ( ! $uname || ! $pwd ) {
-			echo json_encode( [
-				"errno"  => - 1002,
-				"errmsg" => "用户名或密码必须传递",
-			] );
+			echo json_encode( Err_Map::get( 1002 ) );
 
 			return false;
 		}
 		// 调用Model，做登录验证
 		$model = new UserModel();
 		if ( $model->register( trim( $uname ), trim( $pwd ) ) ) {
-			echo json_encode( [
-				"errno"  => 0,
-				"errmsg" => "",
-				"data"   => [ "name" => $uname ]
-			] );
+			echo Common_Request::response( 0, "", [ 'name' => $uname ] );
 		} else {
-			echo json_encode( [
-				"errno"  => $model->errno,
-				"errmsg" => $model->errmsg
-			] );
+			echo Common_Request::response( $model->errno, $model->errmsg );
 		}
 
 		return false;

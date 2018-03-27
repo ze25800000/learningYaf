@@ -24,8 +24,7 @@ class UserModel {
 		}
 
 		if ( Common_Password::pwdEncode( $pwd ) != $userInfo['pwd'] ) {
-			$this->errno  = - 1003;
-			$this->errmsg = '密码错误';
+			list( $this->errno, $this->errmsg ) = Err_Map::get( 1003 );
 
 			return false;
 		}
@@ -42,8 +41,7 @@ class UserModel {
 		}
 
 		if ( strlen( $pwd ) < 8 ) {
-			$this->errmsg = "密码长度不足8位";
-			$this->errno  = - 1006;
+			list( $this->errno, $this->errmsg ) = Err_Map::get( 1006 );
 
 			return false;
 		} else {
