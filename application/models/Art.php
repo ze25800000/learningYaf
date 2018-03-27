@@ -164,7 +164,7 @@ class ArtModel {
 
 	public function del( $artId ) {
 		$query = $this->_db->prepare( "DELETE FROM `art` WHERE `id`=?" );
-		$ret   = $query->execute( intval( $artId ) );
+		$ret   = $query->execute( [intval( $artId )] );
 		if ( ! $ret ) {
 			$this->errno  = - 2007;
 			$this->errmsg = "删除失败，ErrInfo：" . end( $query->errorInfo() );
