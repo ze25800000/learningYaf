@@ -125,14 +125,24 @@ class ArtModel {
 			$isEdit = true;
 		} else {
 			/* add */
-			$query = $this->_db->prepare( "select count(*) from `cate` WHERE `id`=?" );
-			$query->execute( [ $cate ] );
-			$ret = $query->fetchAll();
-			if ( ! $ret || $ret [0][0] == 0 ) {
-				$this->errno  = - 2005;
-				$this->errmsg = "找不到你要的分类信息，cate id：" . $cate . "，请先创建该分类";
 
-				return false;
+			$redis       = new Predis\Client();
+			$redisKey    = 'cateExists-' . $cate;
+			$redistValue = 1;
+
+			if ( ! $redis->get( $redisKey ) ) {
+
+				$query = $this->_db->prepare( "select count(*) from `cate` WHERE `id`=?" );
+				$query->execute( [ $cate ] );
+				$ret = $query->fetchAll();
+				if ( ! $ret || $ret [0][0] == 0 ) {
+					$this->errno  = - 2005;
+					$this->errmsg = "找不到你要的分类信息，cate id：" . $cate . "，请先创建该分类";
+
+					return false;
+				}
+			} else {
+				$redis->set( $redisKey, $redistValue );
 			}
 		}
 		/**
@@ -164,7 +174,7 @@ class ArtModel {
 
 	public function del( $artId ) {
 		$query = $this->_db->prepare( "DELETE FROM `art` WHERE `id`=?" );
-		$ret   = $query->execute( [intval( $artId )] );
+		$ret   = $query->execute( [ intval( $artId ) ] );
 		if ( ! $ret ) {
 			$this->errno  = - 2007;
 			$this->errmsg = "删除失败，ErrInfo：" . end( $query->errorInfo() );

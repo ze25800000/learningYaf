@@ -43,30 +43,34 @@ class WxpayModel extends WxPayNotify {
 
 			return false;
 		}
+		try {
+			$this->_db->beginTransaction();
 
-		/**
-		 * 创建订单
-		 */
-		$query = $this->_db->prepare( "insert into `bill` (`itemid`,`uid`,`price`,`status`,`ctime`) VALUES (?,?,?,'unpaid',date( 'Y-m-d H:i:s' ))" );
-		$ret   = $query->execute( [ $itemId, $uid, intval( $item['price'] ) ] );
-		if ( ! $ret ) {
-			$this->errno  = - 6006;
-			$this->errmsg = '创建账单失败';
+			/**
+			 * 创建订单
+			 */
+			$query = $this->_db->prepare( "insert into `bill` (`itemid`,`uid`,`price`,`status`,`ctime`) VALUES (?,?,?,'unpaid',date( 'Y-m-d H:i:s' ))" );
+			$ret   = $query->execute( [ $itemId, $uid, intval( $item['price'] ) ] );
+			if ( ! $ret ) {
+				$this->errno  = - 6006;
+				$this->errmsg = '创建账单失败';
+				throw new PDOException( '创建账单失败' );
+			}
+			$lastId = intval( $this->_db->lastInsertId() );
 
-			return false;
-		}
-		$lastId = intval( $this->_db->lastInsertId() );
-
-		/**
-		 * 库存减1
-		 */
-		$query = $this->_db->prepare( "UPDATE `item` SET `stock`=`stock`-1 WHERE `id`=?" );
-		$ret   = $query->execute( [ $itemId ] );
-		if ( ! $ret ) {
-			$this->errno  = - 6007;
-			$this->errmsg = '更新库存失败';
-
-			return false;
+			/**
+			 * 库存减1
+			 */
+			$query = $this->_db->prepare( "UPDATE `item` SET `stock`=`stock`-1 WHERE `id`=?" );
+			$ret   = $query->execute( [ $itemId ] );
+			if ( ! $ret ) {
+				$this->errno  = - 6007;
+				$this->errmsg = '更新库存失败';
+				throw new PDOException( '更新库存失败' );
+			}
+			$this->_db->commit();
+		} catch ( PDOException $e ) {
+			$this->_db->rollback();
 		}
 
 		return $lastId;

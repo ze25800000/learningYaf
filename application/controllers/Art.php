@@ -1,18 +1,14 @@
 <?php
 
-/**
- * @name IndexController
- * @author
- * @desc 默认控制器
- * @see http://www.php.net/manual/en/class.yaf-controller-abstract.php
- */
+include_once( dirname( __FILE__ ) . '/../../vendor/autoload.php' );
+
 class ArtController extends Yaf_Controller_Abstract {
 	public function indexAction() {
 		return $this->listAction();
 	}
 
 	public function addAction( $artId = 0 ) {
-		if ( ! Admin_Object::isAdmin()) {
+		if ( ! Admin_Object::isAdmin() ) {
 			echo json_encode( [
 				'errno'  => - 2000,
 				"errmsg" => "需要管理员才可以操作"
@@ -61,7 +57,7 @@ class ArtController extends Yaf_Controller_Abstract {
 	}
 
 	public function editAction() {
-		if ( ! Admin_Object::isAdmin()) {
+		if ( ! Admin_Object::isAdmin() ) {
 			echo json_encode( [
 				'errno'  => - 2000,
 				"errmsg" => "需要管理员才可以操作"
@@ -85,7 +81,7 @@ class ArtController extends Yaf_Controller_Abstract {
 	}
 
 	public function delAction() {
-		if ( ! Admin_Object::isAdmin()) {
+		if ( ! Admin_Object::isAdmin() ) {
 			echo json_encode( [
 				'errno'  => - 2000,
 				"errmsg" => "需要管理员才可以操作"
@@ -122,7 +118,7 @@ class ArtController extends Yaf_Controller_Abstract {
 	}
 
 	public function statusAction() {
-		if ( ! Admin_Object::isAdmin()) {
+		if ( ! Admin_Object::isAdmin() ) {
 			echo json_encode( [
 				'errno'  => - 2000,
 				"errmsg" => "需要管理员才可以操作"
