@@ -1,8 +1,7 @@
 <?php
-
 /**
  * @name Bootstrap
- * @author
+ * @author desktop-vlubo2q\ze258
  * @desc 所有在Bootstrap类中, 以_init开头的方法, 都会被Yaf调用,
  * @see http://www.php.net/manual/en/class.yaf-bootstrap-abstract.php
  * 这些方法, 都接受一个参数:Yaf_Dispatcher $dispatcher
@@ -10,27 +9,23 @@
  */
 class Bootstrap extends Yaf_Bootstrap_Abstract {
 
-	public function _initConfig() {
+    public function _initConfig() {
 		//把配置保存起来
 		$arrConfig = Yaf_Application::app()->getConfig();
-		Yaf_Registry::set( 'config', $arrConfig );
+		Yaf_Registry::set('config', $arrConfig);
 	}
 
-	public function _initPlugin( Yaf_Dispatcher $dispatcher ) {
+	public function _initPlugin(Yaf_Dispatcher $dispatcher) {
 		//注册一个插件
 		$objSamplePlugin = new SamplePlugin();
-		$dispatcher->registerPlugin( $objSamplePlugin );
+		$dispatcher->registerPlugin($objSamplePlugin);
 	}
 
-	public function _initRoute( Yaf_Dispatcher $dispatcher ) {
+	public function _initRoute(Yaf_Dispatcher $dispatcher) {
 		//在这里注册自己的路由协议,默认使用简单路由
-		//创建一个路由协议实例
-	/*	$router = Yaf_Dispatcher::getInstance()->getRouter();
-		$route  = new Yaf_Route_Rewrite( 'user/index', [ 'controller' => 'user', 'action' => 'index' ] );
-		$router->addRoute( 'product', $route );*/
 	}
-
-	public function _initView( Yaf_Dispatcher $dispatcher ) {
+	
+	public function _initView(Yaf_Dispatcher $dispatcher) {
 		//在这里注册自己的view控制器，例如smarty,firekylin
 	}
 }
