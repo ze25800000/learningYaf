@@ -6,7 +6,12 @@ class UserController extends Yaf_Controller_Abstract {
 	}
 
 	public function loginAction() {
-		print_r( Common_Request::request() );
+		$uname = Common_Request::postRequest( 'uname', '' );
+		$pwd   = Common_Request::postRequest( 'pwd', '' );
+
+		if ( ! $uname || ! $pwd ) {
+			echo json_encode( Err_Map::get( 1002 ) );
+		}
 
 		return false;
 	}
